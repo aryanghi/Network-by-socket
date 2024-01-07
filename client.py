@@ -18,10 +18,37 @@ def put(file_name):
         bytes = f.read()
     s.send(bytes)
 
-def get(filename):
-    pass
+def get(file_n):
+    global s
+    file_n, file_f = os.path.split(file_n)
+    print(file_n,file_f)
+    s.send(b'get file'+b'\n')
+    s.send(file_n.encode('utf-8') + b'\n')
+    s.send(file_f.encode('utf-8') + b'\n')
+    size=b''
+    bytes=b''
+    while True:
+        st=s.recv(1)
+        if st==b'\n':
+            break
+        elif not st:
+            break
+        size += st
+
+    while True:
+        st=s.recv(int(size.decode()))
+        if not st:
+            break
+        bytes += st
+    with open(file_n+'send'+file_f,'wb') as f:
+        f.write(bytes)
 
 def disconnect():
-    pass
+    global s
+    s.send(b'exit'+b'\n')
+    s.close()
 
-put('received_file.png')
+
+
+
+
